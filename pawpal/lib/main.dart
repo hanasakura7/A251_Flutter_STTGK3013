@@ -5,10 +5,6 @@ void main() {
   runApp(const MainApp());
 }
 
-class MyConfig {
-  static const String baseUrl = "http://192.168.59.1";
-}
-
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
@@ -19,11 +15,11 @@ class MainApp extends StatelessWidget {
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 234, 215, 146)),
         appBarTheme: AppBarTheme(
-          backgroundColor: Color.fromARGB(255, 234, 215, 146),
+          backgroundColor: Color.fromARGB(255, 232, 217, 164),
           foregroundColor: Colors.black,
           ),
       ),
       home: SplashScreen(),
     );
   }
-}   
+}

@@ -6,7 +6,7 @@ import 'package:pawpal/models/user.dart';
 import 'package:pawpal/views/mainscreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pawpal/views/registerscreen.dart';
-import 'package:pawpal/main.dart';
+import 'package:pawpal/myconfig.dart';
 import 'package:flutter/gestures.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -66,6 +66,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     decoration: const InputDecoration(
                       labelText: 'Email',
                       border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.email),
+
                     ),
                   ),
                   SizedBox(height: 5),
@@ -87,7 +89,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                         icon: const Icon(Icons.visibility),
                       ),
-                      border: const OutlineInputBorder(),
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.lock),
                     ),
                   ),
                   SizedBox(height: 5),

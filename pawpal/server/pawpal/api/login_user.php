@@ -1,5 +1,5 @@
 <?php
-header("Access-Control-Allow-Origin: *"); // running as crome app
+header("Access-Control-Allow-Origin: *"); // running as chrome app
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (!isset($_POST['email']) || !isset($_POST['password'])) {

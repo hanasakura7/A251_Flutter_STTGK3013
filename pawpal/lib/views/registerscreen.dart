@@ -6,7 +6,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pawpal/views/loginscreen.dart';
-import 'package:pawpal/main.dart';
+import 'package:pawpal/myconfig.dart';
 import 'package:flutter/gestures.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -59,6 +59,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     decoration: InputDecoration(
                       labelText: 'Name',
                       border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.person),
                     ),
                   ),
                   SizedBox(height: 5),
@@ -67,6 +68,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     decoration: InputDecoration(
                       labelText: 'Phone',
                       border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.phone),
                     ),
                   ),
                   SizedBox(height: 5),
@@ -75,6 +77,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     decoration: InputDecoration(
                       labelText: 'Email',
                       border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.email),
                     ),
                   ),
                   SizedBox(height: 5),
@@ -95,6 +98,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         icon: Icon(Icons.visibility),
                       ),
                       border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.lock),
                     ), //InputDecoration
                   ),
                   SizedBox(height: 5),
@@ -103,7 +107,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     obscureText: visible,
                     decoration: InputDecoration(
                       labelText: 'Confirm Password',
-                      border: OutlineInputBorder(),
                       suffixIcon: IconButton(
                         onPressed: () {
                           if (visible) {
@@ -115,6 +118,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         },
                         icon: Icon(Icons.visibility),
                       ),
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.lock),
                     ),
                   ),
                   SizedBox(height: 20),
@@ -200,7 +205,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
       return;
     }
-     if (!RegExp(r'^[0-9]+$').hasMatch(phone)) {
+    if (!RegExp(r'^[0-9]+$').hasMatch(phone)) {
       SnackBar snackBar = const SnackBar(
         content: Text('Phone number must contain digits only'),
       );
@@ -239,7 +244,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() {
       isLoading = true;
     });
-     showDialog(
+    showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
@@ -275,7 +280,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               if (!mounted) return;
               SnackBar snackBar = const SnackBar(
                 content: Text('Registration Successful!'),
-                backgroundColor: Colors.green
+                backgroundColor: Colors.green,
               );
               if (isLoading) {
                 if (!mounted) return;
