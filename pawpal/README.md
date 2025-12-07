@@ -2,7 +2,7 @@
 
 PawPal is a continuous project series to develop a full-stack mobile app using Flutter (frontend) and PHP + MySQL (backend).
 
-Features (As of Lab Assignment 2):
+# Features (As of Lab Assignment 2):
 
 - User Registration and Login
 
@@ -12,14 +12,14 @@ Features (As of Lab Assignment 2):
 
 - Error handling, data validation, and UI feedback messages
 
-Features Added (As of Midterm):
+# Features Added (As of Midterm):
 
 **Errors in displaying details entered on Main Page 
 - Setup steps: Dependencies Installed (Geolocation, Geocoding, Image cropper, Image Picker), Backend URL, PHP backend (to submit and get pet informaation), MySQL database (tbl_users and tbl_pets undder pawlpal_db)
 - API explanation: submit_pet.php to receive details of pets, get_my_pets to retrieve details, and load into main page) 
 - Sample JSON: submit_pet request and get_my_pets requests, with fail/success/error response  
 
-App Screenshots:
+# App Screenshots:
 
 <img width="284" height="637" alt="Screenshot (90)" src="https://github.com/user-attachments/assets/33b4f331-5e1f-41ef-ac25-8b6c791c648a" />
 
