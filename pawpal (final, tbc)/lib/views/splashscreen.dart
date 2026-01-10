@@ -1,0 +1,85 @@
+import 'package:flutter/material.dart';
+import 'package:pawpal/views/loginscreen.dart';
+import 'package:pawpal/myconfig.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(seconds: 3), () {
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        // ignore: use_build_context_synchronously
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset('assets/images/Paw.png', scale: 2),
+            SizedBox(height: 20),
+            Container(
+              width: 260,
+              height: 14,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.brown, width: 2),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: LinearProgressIndicator(
+                  color: Color.fromARGB(255, 234, 215, 146),
+                  backgroundColor: Colors.brown.shade300,
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            Text('Loading...'),
+          ],
+        ),
+      ),
+    );
+  } //build
+
+  Future<void> testConnection() async {
+    try {
+      // This uses your MyConfig.baseUrl
+      var url = Uri.parse("${MyConfig.baseUrl}/pawpal/php/ping.php");
+
+      var response = await http.get(url).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        print("Connection Success: ${data['message']}");
+        // Show a success message to yourself
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Connected to Hosting: ${data['timestamp']}")),
+        );
+      } else {
+        print("Server error: ${response.statusCode}");
+      }
+    } catch (e) {
+      // This is where it will catch if your IP/Domain is wrong
+      print("Connection failed: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Cannot reach server. Check baseUrl!")),
+      );
+    }
+  }
+}
