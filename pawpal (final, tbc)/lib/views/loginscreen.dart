@@ -67,7 +67,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       labelText: 'Email',
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.email),
-
                     ),
                   ),
                   SizedBox(height: 5),
@@ -137,8 +136,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   backgroundColor: Colors.red,
                                 ),
                               );
-                              emailController.clear();
-                              passwordController.clear();
+
                               setState(() {});
                             }
                           },
@@ -231,7 +229,7 @@ class _LoginScreenState extends State<LoginScreen> {
     String password = passwordController.text.trim();
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text("Please enter your email and password!"),
           backgroundColor: Colors.red,
         ),
@@ -246,25 +244,38 @@ class _LoginScreenState extends State<LoginScreen> {
         .then((response) {
           if (response.statusCode == 200) {
             var jsonResponse = response.body;
-            // ignore: avoid_print
             print(jsonResponse);
             var resarray = jsonDecode(jsonResponse);
-            if (resarray['status'] == 'success') {
-              //print(resarray['data'][0]);
-              user = User.fromJson(resarray['data'][0]);
 
-              if (!mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text("Login successful"),
-                  backgroundColor: Colors.green,
-                ),
-              );
-              // Navigate to home page or dashboard
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => MainScreen(user: user)),
-              );
+            if (resarray['status'] == 'success') {
+              try {
+                // FIX: Access the first element of the list [0]
+                user = User.fromJson(resarray['data'][0]);
+
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Login successful"),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MainScreen(user: user),
+                  ),
+                );
+              } catch (e) {
+                // This will catch and print the error if User.fromJson fails
+                print("Error parsing user data: $e");
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Data Error: $e"),
+                    backgroundColor: Colors.orange,
+                  ),
+                );
+              }
             } else {
               if (!mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
@@ -274,7 +285,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               );
             }
-            // Handle unsuccessful login here
           } else {
             if (!mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
@@ -284,6 +294,9 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             );
           }
+        })
+        .catchError((error) {
+          print("Connection Error: $error");
         });
   }
 }

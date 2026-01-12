@@ -1,46 +1,42 @@
 class User {
   String? userId;
-  String? userEmail;
   String? userName;
-  String? userPhone;
+  String? userEmail;
   String? userPassword;
+  String? userPhone;
   String? userRegdate;
-  int? userCredit;
+  String? userprofileImage;
 
-  String? userProfileImage;
-
+  //userid, name, email, password, phone, reg_date
   User({
     this.userId,
-    this.userEmail,
     this.userName,
-    this.userPhone,
+    this.userEmail,
     this.userPassword,
+    this.userPhone,
     this.userRegdate,
-    this.userCredit,
+    this.userprofileImage,
   });
 
   User.fromJson(Map<String, dynamic> json) {
-    userId = json['user_id'];
-    userEmail = json['user_email'];
-    userName = json['user_name'];
-    userPhone = json['user_phone'];
-    userPassword = json['user_password'];
-    userRegdate = json['user_regdate'];
-    userCredit = int.tryParse(json['user_credit']?.toString() ?? '0') ?? 0;
-    userProfileImage = json['profile_image'];
+    userId = json['user_id']?.toString() ?? '0'; // Ensure it's a string
+    userName = json['name'] ?? 'Guest';
+    userEmail = json['email'] ?? '';
+    userPassword = json['password'] ?? '';
+    userPhone = json['phone'] ?? '';
+    userRegdate = json['reg_date'] ?? '';
+    userprofileImage = json['profile_image'] ?? ""; // Turn null into empty string
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['user_id'] = userId;
-    data['user_email'] = userEmail;
-    data['user_name'] = userName;
-    data['user_phone'] = userPhone;
-    data['user_password'] = userPassword;
-    data['user_regdate'] = userRegdate;
-
-    data['user_credit'] = userCredit;
-    data['profile_image'] = userProfileImage;
+    data['name'] = userName;
+    data['email'] = userEmail;
+    data['password'] = userPassword;
+    data['phone'] = userPhone;
+    data['reg_date'] = userRegdate;
+    data['profile_image'] = userprofileImage;
     return data;
   }
-}
+} //user

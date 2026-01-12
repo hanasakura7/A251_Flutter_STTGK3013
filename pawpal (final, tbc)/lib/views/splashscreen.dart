@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:pawpal/views/loginscreen.dart';
-import 'package:pawpal/myconfig.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -57,29 +54,4 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   } //build
 
-  Future<void> testConnection() async {
-    try {
-      // This uses your MyConfig.baseUrl
-      var url = Uri.parse("${MyConfig.baseUrl}/pawpal/php/ping.php");
-
-      var response = await http.get(url).timeout(const Duration(seconds: 10));
-
-      if (response.statusCode == 200) {
-        var data = jsonDecode(response.body);
-        print("Connection Success: ${data['message']}");
-        // Show a success message to yourself
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Connected to Hosting: ${data['timestamp']}")),
-        );
-      } else {
-        print("Server error: ${response.statusCode}");
-      }
-    } catch (e) {
-      // This is where it will catch if your IP/Domain is wrong
-      print("Connection failed: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Cannot reach server. Check baseUrl!")),
-      );
-    }
-  }
 }

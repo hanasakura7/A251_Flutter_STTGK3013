@@ -27,12 +27,18 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
     'Donation Request',
     'Help/Rescue',
   ];
+  List<String> genders = ['Male', 'Female', 'Unknown'];
+  List<String> healthStatus = ['Healthy', 'Minor Injury', 'Needs Urgent Care'];
 
   TextEditingController petNameController = TextEditingController();
   TextEditingController petDescController = TextEditingController();
+  TextEditingController petAgeController = TextEditingController();
+  TextEditingController petHealthController = TextEditingController();
 
   String selectedPetType = 'Cat';
   String selectedSubmissionCategory = 'Adoption';
+  String selectedGender = 'Male';
+  String selectedHealth = 'Healthy';
 
   List<File> images = [];
   List<Uint8List> webImages = [];
@@ -53,6 +59,12 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.user == null) {
+      return Scaffold(
+        body: Center(child: Text("Please login to submit a pet")),
+      );
+    }
+
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
     if (width > 400) {
@@ -150,11 +162,10 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                         child: Text(type),
                       );
                     }).toList(),
-                    initialValue: selectedPetType, // your selected value
+                    initialValue: selectedPetType,
                     onChanged: (String? newValue) {
                       setState(() {
                         selectedPetType = newValue!;
-                        print(selectedPetType);
                       });
                     },
                   ),
@@ -176,7 +187,6 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                     onChanged: (String? newValue) {
                       setState(() {
                         selectedSubmissionCategory = newValue!;
-                        print(selectedSubmissionCategory);
                       });
                     },
                   ),
@@ -189,26 +199,67 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
                     ),
                     maxLines: 3,
                   ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: petAgeController,
+                          decoration: const InputDecoration(
+                            labelText: "Age (e.g. 2 years)",
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: DropdownButtonFormField<String>(
+                          decoration: const InputDecoration(
+                            labelText: 'Gender',
+                            border: OutlineInputBorder(),
+                          ),
+                          initialValue: selectedGender,
+                          items: genders.map((String g) {
+                            return DropdownMenuItem(value: g, child: Text(g));
+                          }).toList(),
+                          onChanged: (val) =>
+                              setState(() => selectedGender = val!),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  DropdownButtonFormField<String>(
+                    decoration: const InputDecoration(
+                      labelText: 'Health Status',
+                      border: OutlineInputBorder(),
+                    ),
+                    initialValue: selectedHealth,
+                    items: healthStatus.map((String h) {
+                      return DropdownMenuItem(value: h, child: Text(h));
+                    }).toList(),
+                    onChanged: (val) => setState(() => selectedHealth = val!),
+                  ),
+                  const SizedBox(height: 10),
                   TextFormField(
                     controller: TextEditingController(text: "$latitude"),
-                    decoration: InputDecoration(labelText: "Latitude"),
+                    decoration: const InputDecoration(labelText: "Latitude"),
                     readOnly: true,
                   ),
                   TextFormField(
                     controller: TextEditingController(text: "$longitude"),
-                    decoration: InputDecoration(labelText: "Longitude"),
+                    decoration: const InputDecoration(labelText: "Longitude"),
                     readOnly: true,
                   ),
                   const SizedBox(height: 10),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color.fromARGB(255, 99, 79, 4),
+                      backgroundColor: const Color.fromARGB(255, 99, 79, 4),
                       minimumSize: Size(width, 50),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-
                     onPressed: submitPetDialog,
                     child: const Text(
                       "Submit",
@@ -253,10 +304,23 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
 
   // Mobile image picker
   Future<void> pickMobileImage() async {
-    if (images.length >= maxImages) return;
+    // 1. Check if the limit is reached
+    if (images.length >= maxImages) {
+      if (!mounted) return; // Important safety check
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Maximum 3 images reached!")),
+      );
+      return;
+    }
+
+    // 2. Pick the image with compression to prevent crashes
     final XFile? pickedFile = await ImagePicker().pickImage(
       source: ImageSource.gallery,
+      maxWidth: 1024, // Resizes width
+      maxHeight: 1024, // Resizes height
+      imageQuality: 80, // Reduces file size by 20%
     );
+
     if (pickedFile != null) {
       File original = File(pickedFile.path);
       File? cropped = await cropImage(original);
@@ -289,8 +353,8 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
       uiSettings: [
         AndroidUiSettings(
           toolbarTitle: 'Please Crop Your Image!',
-          toolbarColor: Colors.deepPurple,
-          toolbarWidgetColor: Colors.white,
+          toolbarColor: const Color.fromARGB(255, 255, 246, 152),
+          toolbarWidgetColor: Colors.black,
         ),
         IOSUiSettings(title: 'Cropper'),
       ],
@@ -390,6 +454,9 @@ class _SubmitPetScreenState extends State<SubmitPetScreen> {
       request.fields['pet_type'] = selectedPetType;
       request.fields['category'] = selectedSubmissionCategory;
       request.fields['description'] = petDescController.text.trim();
+      request.fields['age'] = petAgeController.text.trim();
+      request.fields['gender'] = selectedGender;
+      request.fields['health'] = selectedHealth;
       request.fields['lat'] = latitude.toString();
       request.fields['lng'] = longitude.toString();
 

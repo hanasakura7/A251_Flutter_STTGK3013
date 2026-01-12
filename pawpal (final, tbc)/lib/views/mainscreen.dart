@@ -7,6 +7,7 @@ import 'package:pawpal/models/mypet.dart';
 import 'package:pawpal/myconfig.dart';
 import 'package:pawpal/views/submitpetscreen.dart';
 import 'package:pawpal/views/petdetailscreen.dart';
+import 'package:pawpal/shared/mydrawer.dart';
 
 class MainScreen extends StatefulWidget {
   final User? user;
@@ -20,12 +21,14 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen>
     with SingleTickerProviderStateMixin {
   List<MyPet> myPets = [];
-  List<MyPet> filteredPets = []; // Added for search/filter logic
+  List<MyPet> filteredPets = [];
+  String selectedType = "All";
+  List<String> petTypes = ["All", "Cat", "Dog", "Other"];
   String status = "Loading...";
   DateFormat formatter = DateFormat('dd/MM/yyyy hh:mm a');
   bool showWelcome = true;
   late double width, height;
-  
+
   // Controller for the search bar
   TextEditingController searchController = TextEditingController();
 
@@ -44,10 +47,18 @@ class _MainScreenState extends State<MainScreen>
   // Suggestion: Filter logic based on Pet Type
   void filterPets(String query) {
     setState(() {
-      filteredPets = myPets
-          .where((pet) =>
-              pet.petType.toString().toLowerCase().contains(query.toLowerCase()))
-          .toList();
+      filteredPets = myPets.where((pet) {
+        // 1. Check if name contains search text
+        bool matchesName = pet.petName.toString().toLowerCase().contains(
+          query.toLowerCase(),
+        );
+
+        // 2. Check if type matches dropdown selection
+        bool matchesType =
+            (selectedType == "All") || (pet.petType.toString() == selectedType);
+
+        return matchesName && matchesType;
+      }).toList();
     });
   }
 
@@ -64,29 +75,77 @@ class _MainScreenState extends State<MainScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text(" PawPal 🐾"),
-        // Added Search Bar to the bottom of AppBar
+        // Task 1: Search bar + Dropdown in PreferredSize
         bottom: showWelcome
             ? null
             : PreferredSize(
-                preferredSize: const Size.fromHeight(60),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextField(
-                    controller: searchController,
-                    onChanged: filterPets,
-                    decoration: InputDecoration(
-                      hintText: "Search by Pet Type (e.g. Cat, Dog)",
-                      prefixIcon: const Icon(Icons.search),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      filled: true,
-                      fillColor: Colors.white,
-                      contentPadding: EdgeInsets.zero,
+                preferredSize: const Size.fromHeight(
+                  120,
+                ), // Height for two rows
+                child: Column(
+                  children: [
+                    // Row 1: Search by Name
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 4.0,
+                      ),
+                      child: TextField(
+                        controller: searchController,
+                        onChanged: filterPets,
+                        decoration: InputDecoration(
+                          hintText: "Search by Pet Name...",
+                          prefixIcon: const Icon(Icons.search),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
                     ),
-                  ),
+                    // Row 2: Filter by Type Dropdown (Requirement 3.2)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 4.0,
+                      ),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.grey),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: selectedType,
+                            isExpanded: true,
+                            items: petTypes.map((String type) {
+                              return DropdownMenuItem(
+                                value: type,
+                                child: Text(type),
+                              );
+                            }).toList(),
+                            onChanged: (newValue) {
+                              setState(() {
+                                selectedType = newValue!;
+                              });
+                              filterPets(
+                                searchController.text,
+                              ); // Apply filter immediately
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
                 ),
               ),
       ),
+      drawer: MyDrawer(user: widget.user),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () async {
@@ -99,6 +158,7 @@ class _MainScreenState extends State<MainScreen>
           loadMyPets();
         },
       ),
+
       body: Stack(
         children: [
           Center(child: showWelcome ? Container() : buildMainContent()),
@@ -110,7 +170,7 @@ class _MainScreenState extends State<MainScreen>
                   opacity: showWelcome ? 1.0 : 0.0,
                   duration: const Duration(seconds: 3),
                   child: Text(
-                    'Welcome, ${widget.user!.userName}!',
+                    'Welcome, ${widget.user?.userName ?? "User"}!',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 24,
@@ -147,8 +207,10 @@ class _MainScreenState extends State<MainScreen>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(status == "" ? "No pets found" : status,
-                        style: const TextStyle(fontSize: 18)),
+                    Text(
+                      status == "" ? "No pets found" : status,
+                      style: const TextStyle(fontSize: 18),
+                    ),
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () {
@@ -169,14 +231,15 @@ class _MainScreenState extends State<MainScreen>
           : ListView.builder(
               itemCount: filteredPets.length, // Uses filtered list
               itemBuilder: (context, index) {
-                // Suggestion: Wrap card with InkWell to navigate to PetDetailScreen
                 return InkWell(
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => PetDetailScreen(
-                            pet: filteredPets[index], user: widget.user!),
+                          pet: filteredPets[index],
+                          user: widget.user!,
+                        ),
                       ),
                     ).then((value) => loadMyPets());
                   },
@@ -269,7 +332,7 @@ class _MainScreenState extends State<MainScreen>
                 color: const Color.fromARGB(255, 99, 79, 4),
                 child: Image.network(
                   // Removed hardcoded .PNG to allow database-defined extension
-                  "${MyConfig.baseUrl}/pawpal/uploads/${pet.petImage}",
+                  "${MyConfig.baseUrl}/pawpal/${pet.petImage}",
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return const Icon(
@@ -288,24 +351,28 @@ class _MainScreenState extends State<MainScreen>
                 children: [
                   Text(
                     pet.petName.toString(),
-                    style: const TextStyle(fontSize: 17, color: Colors.black, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 17,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
                   Text(
                     "Type: ${pet.petType.toString()}",
-                    style: const TextStyle(fontSize: 14, color: Colors.black),
+                    style: const TextStyle(fontSize: 14, color: Color.fromARGB(255, 224, 80, 80)),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     "Category: ${pet.category.toString()}",
-                    style: const TextStyle(fontSize: 14, color: Colors.black),
+                    style: const TextStyle(fontSize: 14, color: Color.fromARGB(255, 95, 78, 209)),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     "Description: ${pet.description.toString()}",
-                    style: const TextStyle(fontSize: 14, color: Colors.black87),
+                    style: const TextStyle(fontSize: 14, color: Color.fromARGB(221, 216, 0, 249)),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),

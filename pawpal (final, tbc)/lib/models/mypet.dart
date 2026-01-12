@@ -9,7 +9,7 @@ class MyPet {
   String? petImage;
   String? lat;
   String? lng;
-  int? age;
+  String? age;
   String? gender;
   String? health;
 
@@ -30,18 +30,18 @@ class MyPet {
   });
 
   MyPet.fromJson(Map<String, dynamic> json) {
-    petId = json['pet_id'];
-    userId = json['user_id'];
-    petName = json['pet_name'];
-    petType = json['pet_type'];
-    category = json['category'];
-    description = json['description'];
-    imagePaths = json['image_paths'];
-    petImage = json['pet_image'];
-    lat = json['lat'];
-    lng = json['lng'];
-    age = json['age']; 
-    gender = json['gender']; 
-    health = json['health']; 
+    petId = json['pet_id']?.toString();
+    userId = json['user_id']?.toString();
+    petName = json['pet_name']?.toString() ?? "Unknown Pet";
+    petType = json['pet_type']?.toString();
+    category = json['category']?.toString();
+    description = json['description']?.toString();
+    imagePaths = json['image_paths']?.toString();
+    petImage = json['pet_image']?.toString(); 
+    lat = json['lat']?.toString();
+    lng = json['lng']?.toString();
+    age = json['age']?.toString(); 
+    gender = json['gender']?.toString(); 
+    health = json['health']?.toString(); 
   }
 }

@@ -1,53 +1,43 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json");
-
-// 1. Database Connection
-include 'dbconnect.php';
+header("Access-Control-Allow-Origin: *"); // running as chrome app
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // 2. Validate Input
     if (!isset($_POST['email']) || !isset($_POST['password'])) {
-        echo json_encode(['status' => 'failed', 'message' => 'Missing email or password']);
+        $response = array('status' => 'failed', 'message' => 'Bad Request');
+        sendJsonResponse($response);
         exit();
     }
 
-    $email = trim($_POST['email']);
-    $password = trim($_POST['password']);
+    $email = $_POST['email'];
+    $password = $_POST['password'];
     $hashedpassword = sha1($password);
 
-    // 3. Attempt Login
-    // Use TRIM() inside the SQL and 'LIKE' for a more flexible match
-    $sqllogin = "SELECT * FROM `tbl_users` WHERE TRIM(`user_email`) LIKE '$email' AND `user_password` = '$hashedpassword'";
+    include 'dbconnect.php';
+
+    $sqllogin = "SELECT * FROM `tbl_users` WHERE `email` = '$email' AND `password` = '$hashedpassword'";
     $result = $conn->query($sqllogin);
     
-    if ($result && $result->num_rows > 0) {
-        $user = $result->fetch_assoc();
-        // Remove password from response for security
-        unset($user['user_password']); 
-        
-        echo json_encode([
-            'status' => 'success', 
-            'message' => 'Login successful', 
-            'data' => $user
-        ]);
-    } else {
-        // 4. If login fails, check why (The Debugger)
-        $checkEmail = "SELECT * FROM `tbl_users` WHERE `user_email` LIKE '%$email%'";
-        $emailResult = $conn->query($checkEmail);
-        
-        if ($emailResult && $emailResult->num_rows > 0) {
-            $msg = "Password mismatch. Check if your registration used sha1.";
-        } else {
-            $msg = "Email not found: " . $email;
+    if ($result->num_rows > 0) {
+        $userdata = array();
+        while ($row = $result->fetch_assoc()) {
+            $userdata[] = $row;
         }
-
-        echo json_encode([
-            'status' => 'failed', 
-            'message' => $msg
-        ]);
+        $response = array('status' => 'success', 'message' => 'Login successful', 'data' => $userdata);
+        sendJsonResponse($response);
+    } else {
+        $response = array('status' => 'failed', 'message' => 'Invalid email or password','data'=> null);
+        sendJsonResponse($response);
     }
+
 } else {
-    echo json_encode(['status' => 'failed', 'message' => 'Method Not Allowed']);
+    $response = array('status' => 'failed', 'message' => 'Method Not Allowed');
+    sendJsonResponse($response);
+    exit();
+}
+
+function sendJsonResponse($sentArray)
+{
+    header('Content-Type: application/json');
+    echo json_encode($sentArray);
 }
 ?>

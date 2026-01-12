@@ -5,6 +5,7 @@ import 'package:pawpal/models/mypet.dart';
 import 'package:pawpal/models/user.dart';
 import 'package:pawpal/myconfig.dart';
 import 'package:pawpal/views/loginscreen.dart';
+import 'package:pawpal/views/donationscreen.dart';
 
 class PetDetailScreen extends StatefulWidget {
   final MyPet pet;
@@ -32,7 +33,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse("${MyConfig.baseUrl}/pawpal/php/submit_adoption.php"),
+        Uri.parse("${MyConfig.baseUrl}/pawpal/api/submit_adoption.php"),
         body: {
           "petid": widget.pet.petId.toString(),
           "userid": widget.user!.userId.toString(),
@@ -69,7 +70,15 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
       appBar: AppBar(
         title: const Text("Pet Details"),
         backgroundColor: const Color.fromARGB(255, 213, 185, 84),
+        actions: [
+          if (widget.user?.userId == widget.pet.userId.toString())
+            IconButton(
+              icon: const Icon(Icons.delete_forever, color: Colors.red),
+              onPressed: () => _deletePetDialog(context),
+            ),
+        ],
       ),
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -84,7 +93,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                   borderRadius: BorderRadius.circular(12),
                   image: DecorationImage(
                     image: NetworkImage(
-                      '${MyConfig.baseUrl}/pawpal/php/${pet.imagePaths![0]}',
+                      '${MyConfig.baseUrl}/pawpal/uploads/pets/${pet.petImage}',
                     ),
                     fit: BoxFit.cover,
                   ),
@@ -99,7 +108,6 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
             ),
             const SizedBox(height: 12),
 
-            // PET DETAILS - CHANGED: Using Wrap to prevent horizontal overflow errors
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -127,6 +135,32 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
             const SizedBox(height: 24),
             const Divider(),
             const SizedBox(height: 16),
+
+            const Divider(),
+            const SizedBox(height: 10),
+
+            // TASK 3: Navigation to Donation
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 195, 175, 252),
+                minimumSize: const Size(double.infinity, 50),
+              ),
+              icon: const Icon(Icons.volunteer_activism, color: Colors.black),
+              label: const Text(
+                "HELP THIS PET",
+                style: TextStyle(color: Colors.black),
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        DonationScreen(pet: widget.pet, user: widget.user!),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 10),
 
             // ADOPTION FORM
             if (widget.user != null) ...[

@@ -34,10 +34,12 @@ class _DonationScreenState extends State<DonationScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("How would you like to help?", 
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text(
+              "How would you like to help?",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 10),
-            
+
             // 1. SELECT DONATION TYPE
             DropdownButtonFormField<String>(
               initialValue: selectedType,
@@ -67,7 +69,7 @@ class _DonationScreenState extends State<DonationScreen> {
                 ),
               ),
             ] else ...[
-              Text("Describe the ${selectedType} item"),
+              Text("Describe the $selectedType item"),
               const SizedBox(height: 8),
               TextField(
                 controller: _descController,
@@ -90,9 +92,12 @@ class _DonationScreenState extends State<DonationScreen> {
                   backgroundColor: const Color.fromARGB(255, 213, 185, 84),
                 ),
                 onPressed: _isLoading ? null : _submitDonation,
-                child: _isLoading 
+                child: _isLoading
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text("Confirm Donation", style: TextStyle(color: Colors.black)),
+                    : const Text(
+                        "Confirm Donation",
+                        style: TextStyle(color: Colors.black),
+                      ),
               ),
             ),
           ],
@@ -111,19 +116,23 @@ class _DonationScreenState extends State<DonationScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse("${MyConfig.baseUrl}/pawpal/api/insert_donation.php"),
+        Uri.parse("${MyConfig.baseUrl}/pawpal/api/submit_donation.php"),
         body: {
           "userid": widget.user.userId.toString(),
           "petid": widget.pet.petId.toString(),
           "type": selectedType,
           "amount": selectedType == "Money" ? _amountController.text : "0",
-          "description": selectedType == "Money" ? "Cash Donation" : _descController.text,
+          "description": selectedType == "Money"
+              ? "Cash Donation"
+              : _descController.text,
         },
       );
 
       final data = jsonDecode(response.body);
       if (data['status'] == 'success') {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Thank you for your donation!")));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Thank you for your donation!")),
+        );
         Navigator.pop(context);
       }
     } catch (e) {

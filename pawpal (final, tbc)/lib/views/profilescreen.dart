@@ -36,8 +36,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
-    final pickedFile =
-        await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
 
     if (pickedFile != null) {
       setState(() {
@@ -47,86 +49,107 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _updateProfile() async {
-  if (nameController.text.isEmpty || phoneController.text.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Please fill all fields")),
-    );
-    return;
-  }
-
-  setState(() => isLoading = true);
-
-  String? base64Image;
-  if (_imageFile != null) {
-    final bytes = await _imageFile!.readAsBytes();
-    base64Image = base64Encode(bytes);
-  }
-
-  try {
-    final response = await http.post(
-      Uri.parse('${MyConfig.baseUrl}/pawpal/api/update_profile.php'),
-      body: {
-        'user_id': widget.user.userId!,
-        'user_name': nameController.text,
-        'user_phone': phoneController.text,
-        if (base64Image != null) 'profile_image': base64Image,
-      },
-    );
-
-    final data = jsonDecode(response.body);
-
-    if (data['status'] == true) {
-      widget.user.userName = nameController.text;
-      widget.user.userPhone = phoneController.text;
-      if (data['profile_image'] != null) {
-        widget.user.userProfileImage = data['profile_image'];
-      }
-
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString('user', jsonEncode(widget.user.toJson()));
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Profile updated successfully")),
-      );
-
-      setState(() => _imageFile = null);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(data['message'] ?? "Update failed")),
-      );
+    if (nameController.text.isEmpty || phoneController.text.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Please fill all fields")));
+      return;
     }
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Error: $e")),
-    );
-  } finally {
-    setState(() => isLoading = false);
-  }
-}
 
+    setState(() => isLoading = true);
+
+    String? base64Image;
+    if (_imageFile != null) {
+      final bytes = await _imageFile!.readAsBytes();
+      base64Image = base64Encode(bytes);
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse('${MyConfig.baseUrl}/pawpal/api/update_profile.php'),
+        body: {
+          'user_id': widget.user.userId!,
+          'user_name': nameController.text,
+          'user_phone': phoneController.text,
+          if (base64Image != null) 'profile_image': base64Image,
+        },
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (data['status'] == true) {
+        widget.user.userName = nameController.text;
+        widget.user.userPhone = phoneController.text;
+        if (data['profile_image'] != null) {
+          widget.user.userprofileImage = data['profile_image'];
+        }
+
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('user', jsonEncode(widget.user.toJson()));
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Profile updated successfully")),
+        );
+
+        setState(() => _imageFile = null);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(data['message'] ?? "Update failed")),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error: $e")));
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
 
   Widget _buildAvatar() {
+    // 1. If the user just picked a NEW image locally
     if (_imageFile != null) {
+      return CircleAvatar(radius: 50, backgroundImage: FileImage(_imageFile!));
+    }
+
+    // 2. If there is an existing profile image on the server
+    // Check both userprofileImage and profileImage based on your model's naming
+    String? imagePath =
+        widget.user.userprofileImage ?? widget.user.userprofileImage;
+
+    if (imagePath != null && imagePath.isNotEmpty && imagePath != "null") {
       return CircleAvatar(
         radius: 50,
-        backgroundImage: FileImage(_imageFile!),
-      );
-    } else if (widget.user.userProfileImage != null) {
-      return CircleAvatar(
-        radius: 50,
-        backgroundImage:
-            NetworkImage('${MyConfig.baseUrl}/${widget.user.userProfileImage}'),
-      );
-    } else {
-      return CircleAvatar(
-        radius: 50,
-        backgroundColor: Colors.grey.shade400,
-        child: Text(
-          widget.user.userName?.substring(0, 1).toUpperCase() ?? '',
-          style: const TextStyle(fontSize: 32, color: Colors.white),
+        backgroundImage: NetworkImage(
+          '${MyConfig.baseUrl}/pawpal/uploads/profile/$imagePath',
         ),
+        // Error listener to catch 404s gracefully
+        onBackgroundImageError: (exception, stackTrace) {
+          debugPrint("Image load failed: $exception");
+        },
       );
     }
+
+    // 3. Fallback: Show Initials if no image exists
+    return CircleAvatar(
+      radius: 50,
+      backgroundColor: const Color.fromARGB(
+        255,
+        213,
+        185,
+        84,
+      ), // Match your theme color
+      child: Text(
+        (widget.user.userName != null && widget.user.userName!.isNotEmpty)
+            ? widget.user.userName![0].toUpperCase()
+            : '?',
+        style: const TextStyle(
+          fontSize: 32,
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
   }
 
   @override

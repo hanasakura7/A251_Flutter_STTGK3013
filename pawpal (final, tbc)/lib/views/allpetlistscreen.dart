@@ -151,7 +151,7 @@ class _AllPetScreenState extends State<AllPetScreen> {
             child: TextField(
               controller: searchController,
               decoration: InputDecoration(
-                hintText: "Search by pet name",
+                hintText: "Search by Pet Name",
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -222,8 +222,8 @@ class _AllPetScreenState extends State<AllPetScreen> {
     return AppBar(
       elevation: 0,
       backgroundColor: const Color.fromARGB(255, 253, 240, 157),
-      foregroundColor: Colors.white,
-      title: const Text("Pawpal Adoption"),
+      foregroundColor: Colors.black,
+      title: const Text("Pawpal Animals"),
       actions: [
         IconButton(
           icon: const Icon(Icons.refresh),

@@ -40,7 +40,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Payment"),
-        backgroundColor: const Color(0xFF1F3C88),
+        backgroundColor: const Color.fromARGB(255, 40, 164, 236),
       ),
       body: WebViewWidget(controller: _webcontroller),
     );
