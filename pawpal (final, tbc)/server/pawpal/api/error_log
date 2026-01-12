@@ -37,3 +37,32 @@
 [10-Jan-2026 15:27:08 UTC] PHP Notice:  Trying to get property 'num_rows' of non-object in /home/musicbvk/public_html/hana/pawpal/api/login_user.php on line 23
 [10-Jan-2026 15:30:43 UTC] PHP Parse error:  syntax error, unexpected end of file in /home/musicbvk/public_html/hana/pawpal/api/login_user.php on line 50
 [10-Jan-2026 15:35:01 UTC] PHP Notice:  Trying to get property 'num_rows' of non-object in /home/musicbvk/public_html/hana/pawpal/api/register_user.php on line 26
+[11-Jan-2026 07:53:58 UTC] PHP Notice:  Undefined index: userid in /home/musicbvk/public_html/hana/pawpal/api/submit_donations.php on line 6
+[11-Jan-2026 07:53:58 UTC] PHP Notice:  Undefined index: petid in /home/musicbvk/public_html/hana/pawpal/api/submit_donations.php on line 7
+[11-Jan-2026 07:53:58 UTC] PHP Notice:  Undefined index: type in /home/musicbvk/public_html/hana/pawpal/api/submit_donations.php on line 8
+[11-Jan-2026 07:53:58 UTC] PHP Notice:  Undefined index: amount in /home/musicbvk/public_html/hana/pawpal/api/submit_donations.php on line 9
+[11-Jan-2026 07:53:58 UTC] PHP Notice:  Undefined index: description in /home/musicbvk/public_html/hana/pawpal/api/submit_donations.php on line 10
+[11-Jan-2026 07:54:26 UTC] PHP Notice:  Undefined index: name in /home/musicbvk/public_html/hana/pawpal/api/register_user.php on line 11
+[11-Jan-2026 07:54:26 UTC] PHP Notice:  Undefined index: email in /home/musicbvk/public_html/hana/pawpal/api/register_user.php on line 12
+[11-Jan-2026 07:54:26 UTC] PHP Notice:  Undefined index: phone in /home/musicbvk/public_html/hana/pawpal/api/register_user.php on line 13
+[11-Jan-2026 07:54:26 UTC] PHP Notice:  Undefined index: password in /home/musicbvk/public_html/hana/pawpal/api/register_user.php on line 14
+[11-Jan-2026 07:54:36 UTC] PHP Notice:  Undefined index: email in /home/musicbvk/public_html/hana/pawpal/api/payment_update.php on line 5
+[11-Jan-2026 07:54:36 UTC] PHP Notice:  Undefined index: phone in /home/musicbvk/public_html/hana/pawpal/api/payment_update.php on line 6
+[11-Jan-2026 07:54:36 UTC] PHP Notice:  Undefined index: name in /home/musicbvk/public_html/hana/pawpal/api/payment_update.php on line 7
+[11-Jan-2026 07:54:36 UTC] PHP Notice:  Undefined index: credit in /home/musicbvk/public_html/hana/pawpal/api/payment_update.php on line 8
+[11-Jan-2026 07:54:36 UTC] PHP Notice:  Undefined index: userid in /home/musicbvk/public_html/hana/pawpal/api/payment_update.php on line 9
+[11-Jan-2026 07:54:36 UTC] PHP Notice:  Undefined index: billplz in /home/musicbvk/public_html/hana/pawpal/api/payment_update.php on line 12
+[11-Jan-2026 07:54:36 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/musicbvk/public_html/hana/pawpal/api/payment_update.php on line 12
+[11-Jan-2026 07:54:36 UTC] PHP Notice:  Undefined index: billplz in /home/musicbvk/public_html/hana/pawpal/api/payment_update.php on line 13
+[11-Jan-2026 07:54:36 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/musicbvk/public_html/hana/pawpal/api/payment_update.php on line 13
+[11-Jan-2026 07:54:36 UTC] PHP Notice:  Undefined index: billplz in /home/musicbvk/public_html/hana/pawpal/api/payment_update.php on line 14
+[11-Jan-2026 07:54:36 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/musicbvk/public_html/hana/pawpal/api/payment_update.php on line 14
+[11-Jan-2026 07:54:36 UTC] PHP Notice:  Undefined index: billplz in /home/musicbvk/public_html/hana/pawpal/api/payment_update.php on line 15
+[11-Jan-2026 07:54:36 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/musicbvk/public_html/hana/pawpal/api/payment_update.php on line 15
+[11-Jan-2026 07:54:36 UTC] PHP Notice:  Undefined variable: petid in /home/musicbvk/public_html/hana/pawpal/api/payment_update.php on line 22
+[11-Jan-2026 07:54:36 UTC] PHP Notice:  Undefined variable: amount in /home/musicbvk/public_html/hana/pawpal/api/payment_update.php on line 22
+[11-Jan-2026 07:54:36 UTC] PHP Notice:  Undefined index: billplz in /home/musicbvk/public_html/hana/pawpal/api/payment_update.php on line 26
+[11-Jan-2026 07:54:36 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/musicbvk/public_html/hana/pawpal/api/payment_update.php on line 26
+[11-Jan-2026 07:54:36 UTC] PHP Notice:  Undefined index: billplz in /home/musicbvk/public_html/hana/pawpal/api/payment_update.php on line 32
+[11-Jan-2026 07:54:36 UTC] PHP Notice:  Trying to access array offset on value of type null in /home/musicbvk/public_html/hana/pawpal/api/payment_update.php on line 32
+[11-Jan-2026 07:55:53 UTC] PHP Notice:  Undefined index: petid in /home/musicbvk/public_html/hana/pawpal/api/delete_pet.php on line 10

@@ -11,8 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 // Get POST data
 $user_id = intval($_POST['user_id'] ?? 0);
-$name = $conn->real_escape_string($_POST['user_name'] ?? '');
-$phone = $conn->real_escape_string($_POST['user_phone'] ?? '');
+$name = $conn->real_escape_string($_POST['name'] ?? '');
+$phone = $conn->real_escape_string($_POST['phone'] ?? '');
 $profileImage = $_POST['profile_image'] ?? null;
 
 if (!$user_id || !$name || !$phone) {
@@ -29,7 +29,7 @@ if (!empty($profileImage)) {
         exit();
     }
 
-    $folder = __DIR__ . "/../assets/profiles/";
+    $folder = __DIR__ . "/../uploads/profile/";
     if (!file_exists($folder)) {
         mkdir($folder, 0777, true);
     }
@@ -44,7 +44,7 @@ if (!empty($profileImage)) {
 }
 
 // Build SQL update
-$updateFields = "user_name='$name', user_phone='$phone'";
+$updateFields = "name='$name', phone='$phone'";
 if ($imageName) {
     $updateFields .= ", profile_image='$imageName'";
 }
@@ -55,7 +55,7 @@ if ($conn->query($sql)) {
     echo json_encode([
         'status' => true,
         'message' => 'Profile updated successfully',
-        'profile_image' => $imageName ? "assets/profiles/$imageName" : null
+        'profile_image' => $imageName ?? null
     ]);
 } else {
     echo json_encode([

@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Generation Time: Jan 11, 2026 at 02:47 PM
--- Server version: 10.3.39-MariaDB-log-cll-lve
--- PHP Version: 8.1.34
+-- Host: 127.0.0.1
+-- Generation Time: Jan 12, 2026 at 12:37 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `musicbvk_pawpal_db_hana`
+-- Database: `pawpal_db`
 --
 
 -- --------------------------------------------------------
@@ -28,13 +28,21 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `tbl_adoptions` (
-  `id` int(11) NOT NULL,
+  `submission_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `pet_id` int(11) NOT NULL,
-  `submission_id` int(11) NOT NULL,
   `motivation` text NOT NULL,
   `update_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbl_adoptions`
+--
+
+INSERT INTO `tbl_adoptions` (`submission_id`, `user_id`, `pet_id`, `motivation`, `update_at`) VALUES
+(1, 2, 3, 'she is cute', '2026-01-12 17:59:34'),
+(2, 4, 3, 'she is cute', '2026-01-12 18:43:22'),
+(3, 4, 3, 'she is cute', '2026-01-12 19:10:16');
 
 -- --------------------------------------------------------
 
@@ -52,7 +60,7 @@ CREATE TABLE `tbl_donations` (
   `donor_name` varchar(255) NOT NULL,
   `donor_email` varchar(255) NOT NULL,
   `donor_phone` varchar(20) NOT NULL,
-  `donation_at` datetime NOT NULL DEFAULT current_timestamp()
+  `donation_date` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -71,11 +79,19 @@ CREATE TABLE `tbl_pets` (
   `image_paths` text NOT NULL,
   `lat` varchar(50) NOT NULL,
   `lng` varchar(50) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `age` int(2) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `age` varchar(2) NOT NULL,
   `gender` varchar(10) NOT NULL,
   `health` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbl_pets`
+--
+
+INSERT INTO `tbl_pets` (`pet_id`, `user_id`, `pet_name`, `pet_type`, `category`, `description`, `image_paths`, `lat`, `lng`, `created_at`, `age`, `gender`, `health`) VALUES
+(3, 2, 'mel', 'Cat', 'Adoption', '3 years old kitty found under the tree', '[\"uploads/pets/pet_1768211908_0.jpg\"]', '6.4551017', '100.50632', '2026-01-12 09:58:28', '3', 'Female', 'Healthy'),
+(5, 5, 'sam', 'Cat', 'Help/Rescue', 'sam is stuck at a tree', '[\"uploads/pets/pet_1768216021_0.jpg\"]', '6.4551017', '100.50632', '2026-01-12 11:07:01', '3', 'Male', 'Minor Injury');
 
 -- --------------------------------------------------------
 
@@ -85,21 +101,23 @@ CREATE TABLE `tbl_pets` (
 
 CREATE TABLE `tbl_users` (
   `user_id` int(5) NOT NULL,
-  `user_name` varchar(100) DEFAULT NULL,
-  `user_email` varchar(100) DEFAULT NULL,
-  `user_password` varchar(255) DEFAULT NULL,
-  `user_phone` varchar(20) DEFAULT NULL,
-  `user_regdate` datetime DEFAULT current_timestamp(),
-  `profile_image` text NOT NULL,
-  `user_credit` int(11) DEFAULT 0
+  `name` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `phone` varchar(20) NOT NULL,
+  `reg_date` datetime DEFAULT current_timestamp(),
+  `profile_image` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tbl_users`
 --
 
-INSERT INTO `tbl_users` (`user_id`, `user_name`, `user_email`, `user_password`, `user_phone`, `user_regdate`, `profile_image`, `user_credit`) VALUES
-(4, 'Arisa', 'arisa@gmail.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0123456789', '2026-01-11 00:57:40', '', 0);
+INSERT INTO `tbl_users` (`user_id`, `name`, `email`, `password`, `phone`, `reg_date`, `profile_image`) VALUES
+(2, 'hafizah', 'hafizah@gmail.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0123456789', '2026-01-12 01:18:35', NULL),
+(3, 'hanis', 'hanis@gmail.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0123456789', '2026-01-12 14:35:26', NULL),
+(4, 'nasreen', 'ana@gmail.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0123456789', '2026-01-12 18:33:37', NULL),
+(5, 'hana', 'hana@gmail.com', '6367c48dd193d56ea7b0baad25b19455e529f5ee', '0123456789', '2026-01-12 19:05:20', NULL);
 
 --
 -- Indexes for dumped tables
@@ -109,7 +127,7 @@ INSERT INTO `tbl_users` (`user_id`, `user_name`, `user_email`, `user_password`, 
 -- Indexes for table `tbl_adoptions`
 --
 ALTER TABLE `tbl_adoptions`
-  ADD PRIMARY KEY (`id`),
+  ADD PRIMARY KEY (`submission_id`),
   ADD KEY `user_id` (`user_id`),
   ADD KEY `pet_id` (`pet_id`);
 
@@ -120,7 +138,7 @@ ALTER TABLE `tbl_donations`
   ADD PRIMARY KEY (`donation_id`),
   ADD KEY `pet_id` (`pet_id`),
   ADD KEY `user_id` (`user_id`),
-  ADD KEY `donation_date` (`donation_at`);
+  ADD KEY `donation_date` (`donation_date`);
 
 --
 -- Indexes for table `tbl_pets`
@@ -142,7 +160,7 @@ ALTER TABLE `tbl_users`
 -- AUTO_INCREMENT for table `tbl_adoptions`
 --
 ALTER TABLE `tbl_adoptions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `submission_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `tbl_donations`
@@ -154,13 +172,13 @@ ALTER TABLE `tbl_donations`
 -- AUTO_INCREMENT for table `tbl_pets`
 --
 ALTER TABLE `tbl_pets`
-  MODIFY `pet_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `pet_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `tbl_users`
 --
 ALTER TABLE `tbl_users`
-  MODIFY `user_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `user_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables

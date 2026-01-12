@@ -1,44 +1,32 @@
+
 <?php
-header("Access-Control-Allow-Origin: *"); // running as chrome app
+header("Access-Control-Allow-Origin: *");
+header("Content-Type: application/json");
+error_reporting(0);
 
-if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-	
-	if (!isset($_GET['user_id'])) {
-		$response = array('status' => 'failed', 'message' => 'Bad Request');
-		sendJsonResponse($response);
-		exit();
-	}
-	$userid = $_GET['user_id'];
+include 'dbconnect.php';
 
-	include 'dbconnect.php';
-	
-	$sqlgetpets = "SELECT * FROM `tbl_pets` WHERE `user_id` = '$userid'";
-	$result = $conn->query($sqlgetpets);
-	
-	if ($result->num_rows > 0) {
-		$petsdata = array();
-		while ($row = $result->fetch_assoc()) {
-			
-			$images = json_decode($row['images'], true);
-			$row['images'] = $images[0] ?? null;
-
-			$petsdata[] = $row;
-		}
-
-		$response = array('status' => 'success', 'message' => 'Pets found!', 'data' => $petsdata);
-		sendJsonResponse($response);
-	} else {
-		$response = array('status' => 'failed', 'message' => 'No pets found','data'=> null);
-		sendJsonResponse($response);
-	}
-} else {
-	$response = array('status' => 'failed', 'message' => 'Method Not Allowed');
-	sendJsonResponse($response);
+if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+    echo json_encode(['status' => 'failed', 'message' => 'Method Not Allowed']);
+    exit();
 }
 
-function sendJsonResponse($sentArray)
-{
-    header('Content-Type: application/json');
-    echo json_encode($sentArray);
+$userid = $_GET['user_id'] ?? '';
+
+$sql = "SELECT * FROM `tbl_pets` WHERE `user_id` = '$userid' ORDER BY `created_at` DESC";
+$result = $conn->query($sql);
+
+$petsdata = [];
+
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $images = json_decode($row['image_paths'], true);
+        if (!is_array($images)) $images = []; // ensure array
+        $row['image_paths'] = $images; // return full array, Flutter can pick [0] if needed
+        $petsdata[] = $row;
+    }
+    echo json_encode(['status' => 'success', 'message' => 'Pets found!', 'data' => $petsdata]);
+} else {
+    echo json_encode(['status' => 'failed', 'message' => 'No pets found', 'data' => []]);
 }
 ?>

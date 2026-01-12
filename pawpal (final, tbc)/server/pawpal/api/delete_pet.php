@@ -9,16 +9,25 @@ include_once("dbconnect.php");
 
 $petid = $_POST['petid'];
 
-// 1. First, get the image names or ID to delete files from the 'uploads' folder
-// Assuming your naming convention is pet_ID_index.png
-$files = glob("../uploads/pet_" . $petid . "_*"); // Find all images related to this pet
-foreach($files as $file){
-    if(is_file($file)) {
-        unlink($file); // Delete the file from the folder
+// 1. Get the image paths from the database first
+$sqlgetimages = "SELECT `image_paths` FROM `tbl_pets` WHERE `pet_id` = '$petid'";
+$result = $conn->query($sqlgetimages);
+
+if ($result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    // Decode the JSON array of images
+    $images = json_decode($row['image_paths'], true);
+    
+    if (is_array($images)) {
+        foreach ($images as $imagePath) {
+            $fullPath = "../" . $imagePath; 
+            if (file_exists($fullPath)) {
+                unlink($fullPath); // Delete the actual file
+            }
+        }
     }
 }
 
-// 2. Delete the record from the database
 $sqldelete = "DELETE FROM `tbl_pets` WHERE `pet_id` = '$petid'";
 
 if ($conn->query($sqldelete) === TRUE) {

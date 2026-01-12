@@ -15,7 +15,6 @@ $data = array(
     'x_signature' => $_GET['billplz']['x_signature']
 );
 
-// Use the exact column names from your screenshot
 $sqlinsert = "INSERT INTO `tbl_donations` 
     (`pet_id`, `user_id`, `donation_type`, `amount`, `donor_name`, `donor_email`, `donor_phone`, `donation_date`) 
     VALUES 

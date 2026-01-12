@@ -1,12 +1,12 @@
 <?php
 error_reporting(0);
 //include_once("dbconnect.php");
-$petid = $_GET['petid'];
-$email = $_GET['email']; //email
-$phone = $_GET['phone']; 
-$name = $_GET['name']; 
-$credit = $_GET['credits']; 
-$userid = $_GET['userid'];
+$petid = $_GET['pet_id'];
+$email = $_GET['user_email']; //email
+$phone = $_GET['user_phone']; 
+$name = $_GET['user_name']; 
+$credit = $_GET['user_credits']; 
+$userid = $_GET['user_id'];
 
 $api_key = '7fbeae84-ade9-4ed6-8f8d-86b201503a1e';
 $collection_id = '1r1jbqs4';

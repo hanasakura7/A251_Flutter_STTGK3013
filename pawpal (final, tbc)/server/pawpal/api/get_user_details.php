@@ -11,8 +11,7 @@ if (!isset($_GET['userid'])) {
 
 $userid = intval($_GET['userid']);
 
-$sql = "SELECT user_id, user_email, user_name, user_phone, user_password, user_otp, user_regdate,
-        user_address, user_latitude, user_longitude, user_credit, profile_image
+$sql = "SELECT user_id, email, name, phone, password, reg_date, profile_image
         FROM tbl_users WHERE user_id = '$userid' LIMIT 1";
 
 $result = $conn->query($sql);

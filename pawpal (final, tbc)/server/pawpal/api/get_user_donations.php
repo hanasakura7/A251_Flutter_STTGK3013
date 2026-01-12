@@ -4,14 +4,13 @@ header("Content-Type: application/json");
 include 'dbconnect.php';
 
 if (isset($_GET['userid'])) {
-    $userid = $_GET['userid'];
+    $userid = $conn->real_escape_string($_GET['userid']);
 
-    // Select donation details + the pet name from tbl_pets
     $sql = "SELECT tbl_donations.*, tbl_pets.pet_name 
-            FROM `tbl_donations` 
-            INNER JOIN `tbl_pets` ON tbl_donations.pet_id = tbl_pets.pet_id 
-            WHERE tbl_donations.user_id = '$userid' 
-            ORDER BY tbl_donations.donation_at DESC";
+        FROM `tbl_donations` 
+        INNER JOIN `tbl_pets` ON tbl_donations.pet_id = tbl_pets.pet_id 
+        WHERE tbl_donations.user_id = '$userid'
+        ORDER BY tbl_donations.donation_date DESC"; 
 
     $result = $conn->query($sql);
 
