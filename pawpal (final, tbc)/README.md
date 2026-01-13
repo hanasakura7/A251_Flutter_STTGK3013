@@ -50,7 +50,6 @@ Database: MySQL
   <tr>
     <td width="25%"><img src="https://github.com/user-attachments/assets/c46da42f-3bc2-4149-95fe-a9fb7250ce3b" alt="Profile"/><br/><sub>Profile</sub></td>
     <td width="25%"><img src="https://github.com/user-attachments/assets/979387bd-82a5-4002-a355-319b07db07fd" alt="Welcome Screen"/><br/><sub>Welcome</sub></td>
-    <td width="25%"></td>
   </tr>
 </table>
 
