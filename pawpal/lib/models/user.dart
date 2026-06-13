@@ -5,23 +5,27 @@ class User {
   String? userPassword;
   String? userPhone;
   String? userRegdate;
+  String? userprofileImage;
 
   //userid, name, email, password, phone, reg_date
-  User(
-    {this.userId,
+  User({
+    this.userId,
     this.userName,
     this.userEmail,
     this.userPassword,
     this.userPhone,
-    this.userRegdate});
+    this.userRegdate,
+    this.userprofileImage,
+  });
 
   User.fromJson(Map<String, dynamic> json) {
-    userId = json['user_id'];
-    userName = json['name'];
-    userEmail = json['email'];
-    userPassword = json['password'];
-    userPhone = json['phone'];
-    userRegdate = json['reg_date'];
+    userId = json['user_id']?.toString() ?? '0'; // Ensure it's a string
+    userName = json['name'] ?? 'Guest';
+    userEmail = json['email'] ?? '';
+    userPassword = json['password'] ?? '';
+    userPhone = json['phone'] ?? '';
+    userRegdate = json['reg_date'] ?? '';
+    userprofileImage = json['profile_image'] ?? ""; // Turn null into empty string
   }
 
   Map<String, dynamic> toJson() {
@@ -32,6 +36,7 @@ class User {
     data['password'] = userPassword;
     data['phone'] = userPhone;
     data['reg_date'] = userRegdate;
+    data['profile_image'] = userprofileImage;
     return data;
   }
 } //user

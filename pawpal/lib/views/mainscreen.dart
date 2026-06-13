@@ -6,6 +6,8 @@ import 'package:pawpal/models/user.dart';
 import 'package:pawpal/models/mypet.dart';
 import 'package:pawpal/myconfig.dart';
 import 'package:pawpal/views/submitpetscreen.dart';
+import 'package:pawpal/views/petdetailscreen.dart';
+import 'package:pawpal/shared/mydrawer.dart';
 
 class MainScreen extends StatefulWidget {
   final User? user;
@@ -19,10 +21,16 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen>
     with SingleTickerProviderStateMixin {
   List<MyPet> myPets = [];
+  List<MyPet> filteredPets = [];
+  String selectedType = "All";
+  List<String> petTypes = ["All", "Cat", "Dog", "Other"];
   String status = "Loading...";
   DateFormat formatter = DateFormat('dd/MM/yyyy hh:mm a');
   bool showWelcome = true;
   late double width, height;
+
+  // Controller for the search bar
+  TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
@@ -33,6 +41,24 @@ class _MainScreenState extends State<MainScreen>
         showWelcome = false;
       });
       loadMyPets();
+    });
+  }
+
+  // Suggestion: Filter logic based on Pet Type
+  void filterPets(String query) {
+    setState(() {
+      filteredPets = myPets.where((pet) {
+        // 1. Check if name contains search text
+        bool matchesName = pet.petName.toString().toLowerCase().contains(
+          query.toLowerCase(),
+        );
+
+        // 2. Check if type matches dropdown selection
+        bool matchesType =
+            (selectedType == "All") || (pet.petType.toString() == selectedType);
+
+        return matchesName && matchesType;
+      }).toList();
     });
   }
 
@@ -47,7 +73,79 @@ class _MainScreenState extends State<MainScreen>
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(" PawPal 🐾")),
+      appBar: AppBar(
+        title: const Text(" PawPal 🐾"),
+        // Task 1: Search bar + Dropdown in PreferredSize
+        bottom: showWelcome
+            ? null
+            : PreferredSize(
+                preferredSize: const Size.fromHeight(
+                  120,
+                ), // Height for two rows
+                child: Column(
+                  children: [
+                    // Row 1: Search by Name
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 4.0,
+                      ),
+                      child: TextField(
+                        controller: searchController,
+                        onChanged: filterPets,
+                        decoration: InputDecoration(
+                          hintText: "Search by Pet Name...",
+                          prefixIcon: const Icon(Icons.search),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                    ),
+                    // Row 2: Filter by Type Dropdown (Requirement 3.2)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 4.0,
+                      ),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.grey),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: selectedType,
+                            isExpanded: true,
+                            items: petTypes.map((String type) {
+                              return DropdownMenuItem(
+                                value: type,
+                                child: Text(type),
+                              );
+                            }).toList(),
+                            onChanged: (newValue) {
+                              setState(() {
+                                selectedType = newValue!;
+                              });
+                              filterPets(
+                                searchController.text,
+                              ); // Apply filter immediately
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                ),
+              ),
+      ),
+      drawer: MyDrawer(user: widget.user),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () async {
@@ -60,6 +158,7 @@ class _MainScreenState extends State<MainScreen>
           loadMyPets();
         },
       ),
+
       body: Stack(
         children: [
           Center(child: showWelcome ? Container() : buildMainContent()),
@@ -71,9 +170,9 @@ class _MainScreenState extends State<MainScreen>
                   opacity: showWelcome ? 1.0 : 0.0,
                   duration: const Duration(seconds: 3),
                   child: Text(
-                    'Welcome, ${widget.user!.userName}!',
+                    'Welcome, ${widget.user?.userName ?? "User"}!',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
@@ -97,33 +196,58 @@ class _MainScreenState extends State<MainScreen>
       );
     }
 
-    if (myPets.isEmpty) {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(status, style: const TextStyle(fontSize: 18)),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SubmitPetScreen(user: widget.user!),
+    // Suggestion: Wrapped with RefreshIndicator to allow pull-to-refresh
+    return RefreshIndicator(
+      onRefresh: () async => loadMyPets(),
+      child: filteredPets.isEmpty
+          ? SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: SizedBox(
+                height: height * 0.7,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      status == "" ? "No pets found" : status,
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                SubmitPetScreen(user: widget.user!),
+                          ),
+                        ).then((_) => loadMyPets());
+                      },
+                      child: const Text("Add Pet"),
+                    ),
+                  ],
                 ),
-              ).then((_) => loadMyPets());
-            },
-            child: Text("Add Pet"),
-          ),
-        ],
-      );
-    } else {
-      return ListView.builder(
-        itemCount: myPets.length,
-        itemBuilder: (context, index) {
-          return buildPetCard(myPets[index], index);
-        },
-      );
-    }
+              ),
+            )
+          : ListView.builder(
+              itemCount: filteredPets.length, // Uses filtered list
+              itemBuilder: (context, index) {
+                return InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PetDetailScreen(
+                          pet: filteredPets[index],
+                          user: widget.user!,
+                        ),
+                      ),
+                    ).then((value) => loadMyPets());
+                  },
+                  child: buildPetCard(filteredPets[index], index),
+                );
+              },
+            ),
+    );
   }
 
   //load dari database
@@ -132,7 +256,8 @@ class _MainScreenState extends State<MainScreen>
 
     setState(() {
       status = "Loading...";
-      myPets.clear(); // Clear previous pets to avoid duplicates
+      myPets.clear();
+      filteredPets.clear();
     });
 
     try {
@@ -148,11 +273,9 @@ class _MainScreenState extends State<MainScreen>
         if (resarray['status'] == 'success') {
           List petsData = resarray['data'] ?? [];
 
-          // Map API data to MyPet objects
           myPets = petsData.map<MyPet>((item) {
             List<dynamic> images = item['image_paths'] ?? [];
 
-            // Handle empty or malformed image_paths
             if (item['image_paths'] != null &&
                 item['image_paths'].toString().isNotEmpty) {
               try {
@@ -167,11 +290,11 @@ class _MainScreenState extends State<MainScreen>
             }
 
             String? thumbnail = images.isNotEmpty ? images[0] : null;
-
             return MyPet.fromJson({...item, 'pet_image': thumbnail});
           }).toList();
 
           setState(() {
+            filteredPets = myPets; // Update filtered list with full data
             status = myPets.isEmpty ? "No pets yet" : "";
           });
         } else {
@@ -204,11 +327,12 @@ class _MainScreenState extends State<MainScreen>
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Container(
-                width: width * 0.28, // more responsive
+                width: width * 0.28,
                 height: width * 0.22,
-                color: Color.fromARGB(255, 99, 79, 4),
+                color: const Color.fromARGB(255, 99, 79, 4),
                 child: Image.network(
-                  "${MyConfig.baseUrl}/pawpal/uploads/${pet.petImage}.PNG",
+                  // Removed hardcoded .PNG to allow database-defined extension
+                  "${MyConfig.baseUrl}/pawpal/${pet.petImage}",
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return const Icon(
@@ -227,33 +351,38 @@ class _MainScreenState extends State<MainScreen>
                 children: [
                   Text(
                     pet.petName.toString(),
-                    style: const TextStyle(fontSize: 17, color: Colors.black),
+                    style: const TextStyle(
+                      fontSize: 17,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
                   Text(
                     "Type: ${pet.petType.toString()}",
-                    style: const TextStyle(fontSize: 14, color: Colors.black),
+                    style: const TextStyle(fontSize: 14, color: Color.fromARGB(255, 224, 80, 80)),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     "Category: ${pet.category.toString()}",
-                    style: const TextStyle(fontSize: 14, color: Colors.black),
+                    style: const TextStyle(fontSize: 14, color: Color.fromARGB(255, 95, 78, 209)),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     "Description: ${pet.description.toString()}",
-                    style: const TextStyle(fontSize: 14, color: Colors.black87),
+                    style: const TextStyle(fontSize: 14, color: Color.fromARGB(221, 216, 0, 249)),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
             ),
+            const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
           ],
         ),
       ),
     );
   }
-} //enddddddddddddddd
+}
